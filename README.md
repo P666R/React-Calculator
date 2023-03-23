@@ -28,6 +28,6 @@
   
 ## Now you can access on localhost:3000
 
-# Hosted On:
+# Hosting Link:
 
 https://react-calculator-p666r.netlify.app/
