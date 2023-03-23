@@ -27,3 +27,7 @@
 -  npm start
   
 ## Now you can access on localhost:3000
+
+# Hosted On:
+
+https://react-calculator-p666r.netlify.app/
