@@ -1,3 +1,8 @@
 # React-Calculator
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/netlify/netlify-statuskit)
+# <div align="center">REACT-CALCULATOR
+</div>
+
+<div align="center">
+<h2>Calculator made using Reactjs
+</div>
