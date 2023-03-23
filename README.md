@@ -1,6 +1,8 @@
 # <div align="center">REACT-CALCULATOR
 </div>
 
+![calculator](https://github.com/P666R/React-Calculator/blob/main/public/cal.jpg)
+
 # Technologies Used:
 ### 1. React.js
 ### 2. React Number Format
