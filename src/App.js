@@ -1,185 +1,214 @@
-import './App.css';
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
+import './App.css';
 
-function App() {
-  // piece of state for previous input
-  const [prevState, setPrevState] = useState('');
-  //  piece of state for current input
-  const [curState, setCurState] = useState('');
-  // piece of state to display the input
-  const [input, setInput] = useState('0');
-  // piece of state for the operators
-  const [operator, setOperator] = useState(null);
-  // piece of state for equality operator
-  const [total, setTotal] = useState(false);
+function Calculator() {
+  // state variables for the calculator's result, operands, operator, and decimal input
+  const [result, setResult] = useState('0');
+  const [operand1, setOperand1] = useState('');
+  const [operator, setOperator] = useState('');
+  const [operand2, setOperand2] = useState('');
+  const [decimal, setDecimal] = useState(false);
 
-  const inputNum = (e) => {
-    //  check to avoid multiple . as input
-    if (curState.includes('.') && e.target.innerText === '.') return;
-
-    // equal operator check
-    if (total) {
-      setPrevState('');
-    }
-
-    // checks for current input, if true concatinate current input state to new input else set new input
-    curState
-      ? setCurState((cur) => cur + e.target.innerText)
-      : setCurState(e.target.innerText);
-    setTotal(false);
-  };
-
-  // on every current input change set it as displayed input
-  useEffect(() => {
-    setInput(curState);
-  }, [curState]);
-
-  // reset the displayed input on initial render
-  useEffect(() => {
-    setInput('0');
-  }, []);
-
-  // operator functionality for any operator button press
-  const operatorType = (e) => {
-    setTotal(false);
-    setOperator(e.target.innerText);
-    if (curState === '') return;
-    if (prevState !== '') {
-      equals();
+  // function to handle clicks on number buttons
+  const handleNumberClick = (num) => {
+    if (operator) {
+      // if there's already an operator, update the second operand
+      if (operand2.length < 8) {
+        // limit digits to 8
+        setOperand2(operand2 + num);
+        setResult(operand2 + num);
+      }
     } else {
-      setPrevState(curState);
-      setCurState('');
+      // otherwise, update the first operand
+      if (operand1.length < 8) {
+        // limit digits to 8
+        setOperand1(operand1 + num);
+        setResult(operand1 + num);
+      }
     }
   };
 
-  // functionality on AC button press
-  const reset = (e) => {
-    setPrevState('');
-    setCurState('');
-    setInput('0');
-  };
-
-  // functionality on % button press
-  const percent = (e) => {
-    prevState
-      ? setCurState(String((parseFloat(curState) / 100) * prevState))
-      : setCurState(String(parseFloat(curState) / 100));
-  };
-
-  // functionality on +/- button press
-  const minusPlus = (e) => {
-    if (curState.charAt(0) === '-') {
-      setCurState(curState.substring(1));
-    } else {
-      setCurState('-' + curState);
+  // function to handle clicks on operator buttons
+  const handleOperatorClick = (op) => {
+    if (!operator) {
+      // if there's no current operator, set the operator and update the result
+      setOperator(op);
+      setResult(op);
+      // reset decimal flag
+      setDecimal(false);
     }
   };
 
-  // functionality on = button press
-  const equals = (e) => {
-    if (e?.target.innerText === '=') {
-      setTotal(true);
-    }
-
-    // switch statement to perform different maths calculations based on different operators
-    let cal;
+  // function to handle clicks on the equals button
+  const handleEqualsClick = () => {
+    let num1 = parseFloat(operand1);
+    let num2 = parseFloat(operand2);
+    let res;
     switch (operator) {
-      case '/':
-        cal = String(parseFloat(prevState) / parseFloat(curState));
-        break;
-      case '*':
-        cal = String(parseFloat(prevState) * parseFloat(curState));
-        break;
       case '+':
-        cal = String(parseFloat(prevState) + parseFloat(curState));
+        res = num1 + num2;
         break;
       case '-':
-        cal = String(parseFloat(prevState) - parseFloat(curState));
+        res = num1 - num2;
+        break;
+      case '*':
+        res = num1 * num2;
+        break;
+      case '/':
+        if (num2 === 0) {
+          // prevent division by zero
+          setResult('Error');
+          setOperand1('');
+          setOperator('');
+          setOperand2('');
+          setDecimal(false);
+          return;
+        }
+        res = num1 / num2;
         break;
       default:
-        return;
+        res = '';
+        break;
     }
+    if (res.toString().length > 8) {
+      // limit digits to 8
+      res = res.toPrecision(8);
+    }
+    // update the result and reset the operands, operator, and decimal flag
+    setResult(res);
+    setOperand1(res);
+    setOperator('');
+    setOperand2('');
+    setDecimal(false);
+  };
 
-    // reset display input, current input and set previous input to calculated value
-    setInput('');
-    setPrevState(cal);
-    setCurState('');
+  // function to handle clicks on the clear button
+  const handleClearClick = () => {
+    // reset all state variables
+    setResult('0');
+    setOperand1('');
+    setOperator('');
+    setOperand2('');
+    setDecimal(false);
+  };
+
+  // function to handle clicks on the +/- button
+  const handleSignChangeClick = () => {
+    if (operator) {
+      // if there's already an operator, negate the second operand and update the result
+      setOperand2((parseFloat(operand2) * -1).toString());
+      setResult((parseFloat(operand2) * -1).toString());
+    } else {
+      // otherwise, negate the first operand and update the result
+      setOperand1((parseFloat(operand1) * -1).toString());
+      setResult((parseFloat(operand1) * -1).toString());
+    }
+  };
+
+  // function to handle clicks on the % button
+  const handlePercentageClick = () => {
+    if (operator) {
+      setOperand2((parseFloat(operand2) / 100).toString());
+      setResult((parseFloat(operand2) / 100).toString());
+    } else {
+      setOperand1((parseFloat(operand1) / 100).toString());
+      setResult((parseFloat(operand1) / 100).toString());
+    }
+  };
+
+  // function to handle clicks on the . button
+  const handleDecimalClick = () => {
+    if (!decimal) {
+      if (operator) {
+        setOperand2(operand2 + '.');
+        setResult(operand2 + '.');
+      } else {
+        setOperand1(operand1 + '.');
+        setResult(operand1 + '.');
+      }
+      setDecimal(true);
+    }
   };
 
   return (
     <div className="container">
       <div className="wrapper">
         <div className="screen">
-          {input !== '' || input === '0' ? (
+          {result !== '' || result === '0' ? (
             <NumericFormat
-              value={input}
+              value={result}
               displayType={'text'}
               thousandSeparator={true}
             />
           ) : (
             <NumericFormat
-              value={prevState}
+              value={operand1}
               displayType={'text'}
               thousandSeparator={true}
             />
           )}
         </div>
-        <div className="btn light-gray" onClick={reset}>
+
+        <div className="btn light-gray" onClick={() => handleClearClick()}>
           AC
         </div>
-        <div className="btn light-gray" onClick={percent}>
-          %
-        </div>
-        <div className="btn light-gray" onClick={minusPlus}>
+        <div className="btn light-gray" onClick={() => handleSignChangeClick()}>
           +/-
         </div>
-        <div className="btn red" onClick={operatorType}>
+        <div className="btn light-gray" onClick={() => handlePercentageClick()}>
+          %
+        </div>
+        <div className="btn red" onClick={() => handleOperatorClick('/')}>
           /
         </div>
-        <div className="btn" onClick={inputNum}>
+
+        <div className="btn" onClick={() => handleNumberClick('7')}>
           7
         </div>
-        <div className="btn" onClick={inputNum}>
+        <div className="btn" onClick={() => handleNumberClick('8')}>
           8
         </div>
-        <div className="btn" onClick={inputNum}>
+        <div className="btn" onClick={() => handleNumberClick('9')}>
           9
         </div>
-        <div className="btn red" onClick={operatorType}>
+        <div className="btn red" onClick={() => handleOperatorClick('*')}>
           *
         </div>
-        <div className="btn" onClick={inputNum}>
+
+        <div className="btn" onClick={() => handleNumberClick('4')}>
           4
         </div>
-        <div className="btn" onClick={inputNum}>
+        <div className="btn" onClick={() => handleNumberClick('5')}>
           5
         </div>
-        <div className="btn" onClick={inputNum}>
+        <div className="btn" onClick={() => handleNumberClick('6')}>
           6
         </div>
-        <div className="btn red" onClick={operatorType}>
-          +
-        </div>
-        <div className="btn" onClick={inputNum}>
-          1
-        </div>
-        <div className="btn" onClick={inputNum}>
-          2
-        </div>
-        <div className="btn" onClick={inputNum}>
-          3
-        </div>
-        <div className="btn red" onClick={operatorType}>
+        <div className="btn red" onClick={() => handleOperatorClick('-')}>
           -
         </div>
-        <div className="btn" onClick={inputNum}>
+
+        <div className="btn" onClick={() => handleNumberClick('1')}>
+          1
+        </div>
+        <div className="btn" onClick={() => handleNumberClick('2')}>
+          2
+        </div>
+        <div className="btn" onClick={() => handleNumberClick('3')}>
+          3
+        </div>
+        <div className="btn red" onClick={() => handleOperatorClick('+')}>
+          +
+        </div>
+
+        <div className="btn" onClick={() => handleNumberClick('0')}>
           0
         </div>
-        <div className="btn" onClick={inputNum}>
+        <div className="btn" onClick={() => handleDecimalClick()}>
           .
         </div>
-        <div className="btn equal" onClick={equals}>
+        <div className="btn equal" onClick={() => handleEqualsClick()}>
           =
         </div>
       </div>
@@ -187,4 +216,4 @@ function App() {
   );
 }
 
-export default App;
+export default Calculator;
