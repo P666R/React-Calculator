@@ -1,9 +1,7 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-// input formatter library
 import { NumericFormat } from 'react-number-format';
 
-//  creating functional component
 function App() {
   // piece of state for previous input
   const [prevState, setPrevState] = useState('');
@@ -13,7 +11,7 @@ function App() {
   const [input, setInput] = useState('0');
   // piece of state for the operators
   const [operator, setOperator] = useState(null);
-  // piece of state for equality operator toggle
+  // piece of state for equality operator
   const [total, setTotal] = useState(false);
 
   const inputNum = (e) => {
@@ -25,14 +23,14 @@ function App() {
       setPrevState('');
     }
 
-    // checks for previous input, if true concatinate current input to previous input else set current input
+    // checks for current input, if true concatinate current input state to new input else set new input
     curState
-      ? setCurState((pre) => pre + e.target.innerText)
+      ? setCurState((cur) => cur + e.target.innerText)
       : setCurState(e.target.innerText);
     setTotal(false);
   };
 
-  // post initial render, update the displayed input on every subsequent rerender if the user provided another input
+  // on every current input change set it as displayed input
   useEffect(() => {
     setInput(curState);
   }, [curState]);
@@ -42,12 +40,10 @@ function App() {
     setInput('0');
   }, []);
 
-  // operator functionalty for any operator button press
+  // operator functionality for any operator button press
   const operatorType = (e) => {
     setTotal(false);
     setOperator(e.target.innerText);
-    // if current input does not exit terminate, if previous input exists check for equality keypress
-    // else set current input as previous input, and set current input piece of state to ''
     if (curState === '') return;
     if (prevState !== '') {
       equals();
@@ -57,7 +53,7 @@ function App() {
     }
   };
 
-  // functionality on all clear buttton press, reset previous, current, display piece of state to default
+  // functionality on AC button press
   const reset = (e) => {
     setPrevState('');
     setCurState('');
@@ -105,6 +101,7 @@ function App() {
         return;
     }
 
+    // reset display input, current input and set previous input to calculated value
     setInput('');
     setPrevState(cal);
     setCurState('');
